@@ -44,3 +44,6 @@ select s.customer_id,sum(case when s.order_date-me.join_date<7 or m.product_name
 select s.customer_id,s.order_date,m.product_name,m.price,case when me.join_date<=s.order_date then'Y' else 'N' end as member from sales s left join members me on s.customer_id=me.customer_id  join menu m on s.product_id=m.product_id order by customer_id,order_date asc ,price desc;
 
 -- 12) Rank All The Things
+with customer_orders_cte as (select s.customer_id,s.order_date,m.product_name,m.price,case when me.join_date<=s.order_date then'Y' else 'N' end as member from sales s left join members me on s.customer_id=me.customer_id  join menu m on s.product_id=m.product_id order by customer_id,order_date asc ,price desc)
+select customer_id, order_date,product_name,price,member,case when member='y' then dense_rank()over(partition by customer_id,member order by order_date) else null end as ranking from customer_orders_cte;
+
